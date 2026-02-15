@@ -10,6 +10,7 @@ class WizardStatAggregatorApplicationTests {
 
     @Test
     fun contextLoads() {
+        println("Hello world!")
     }
 
 }

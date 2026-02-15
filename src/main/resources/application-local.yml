@@ -1,0 +1,5 @@
+infrastructure:
+  http:
+    client:
+      lands-17:
+        base-url: https://www.17lands.com
