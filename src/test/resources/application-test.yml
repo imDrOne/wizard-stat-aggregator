@@ -1,0 +1,9 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-test.yaml
+infrastructure:
+  http:
+    client:
+      lands-17:
+        base-url: https://www.17lands.com

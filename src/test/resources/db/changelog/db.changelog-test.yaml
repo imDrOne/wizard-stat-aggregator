@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/db.changelog-master.yaml
+
+#  Because empty yet
+  - includeAll:
+      path: seeds
+      relativeToChangelogFile: true
