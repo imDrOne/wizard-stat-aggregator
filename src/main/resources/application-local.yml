@@ -1,3 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wizard_stat_db
+    username: wizard_user
+    password: wizard_pass
+    driver-class-name: org.postgresql.Driver
+
 infrastructure:
   http:
     client:

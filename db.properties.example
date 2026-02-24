@@ -1,0 +1,3 @@
+db.migration.url = jdbc:postgresql://localhost:5432/wizard_stat_db
+db.migration.username = wizard_user
+db.migration.password = wizard_pass

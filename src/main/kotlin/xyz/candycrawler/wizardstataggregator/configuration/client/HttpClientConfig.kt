@@ -8,6 +8,7 @@ import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.support.RestClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
+import org.springframework.web.service.invoker.createClient
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.module.kotlin.jsonMapper
 import tools.jackson.module.kotlin.kotlinModule
@@ -17,7 +18,7 @@ import xyz.candycrawler.wizardstataggregator.infrastructure.client.lands17.Lands
 class HttpClientConfig() {
 
     @Bean
-    fun lands17restApiClient(@Value($$"${infrastructure.http.client.lands-17.base-url}") baseUrl: String): Lands17ApiClient {
+    fun lands17restApiClient(@Value("\${infrastructure.http.client.lands-17.base-url}") baseUrl: String): Lands17ApiClient {
         val jsonMapper = jsonMapper {
             addModule(kotlinModule())
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -39,6 +40,6 @@ class HttpClientConfig() {
         return HttpServiceProxyFactory
             .builderFor(RestClientAdapter.create(restClient))
             .build()
-            .createClient(Lands17ApiClient::class.java)
+            .createClient<Lands17ApiClient>()
     }
 }

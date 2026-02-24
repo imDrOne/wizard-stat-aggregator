@@ -23,20 +23,6 @@ interface Lands17ApiClient {
         ) @DateTimeFormat(pattern = "yyyy-MM-dd") endDate: LocalDate = LocalDate.now()
     ): List<CardStatsResponse>
 
-    fun getDraftStatistic(setCode: String): List<CardStatsResponse> {
-        return getStatistic(
-            setCode = setCode,
-            matchType = MatchType.QUICK_DRAFT.value,
-        )
-    }
-
-    fun getSealedStatistic(setCode: String): List<CardStatsResponse> {
-        return getStatistic(
-            setCode = setCode,
-            matchType = MatchType.SEALED.value,
-        )
-    }
-
     enum class MatchType(val value: String) {
         QUICK_DRAFT("QuickDraft"),
         SEALED("Sealed")
