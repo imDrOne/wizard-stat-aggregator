@@ -43,6 +43,12 @@ class CardLimitedStatsSqlMapper {
         }
     }
 
+    internal fun selectById(id: Long): CardLimitedStatsRecord? =
+        CardLimitedStatsTable.selectAll()
+            .where { CardLimitedStatsTable.id eq id }
+            .map { it.toRecord() }
+            .singleOrNull()
+
     internal fun selectByMatchType(matchType: String): List<CardLimitedStatsRecord> =
         CardLimitedStatsTable.selectAll()
             .where { CardLimitedStatsTable.matchType eq matchType }

@@ -1,9 +1,10 @@
-package xyz.candycrawler.wizardstataggregator.domain.repository
+package xyz.candycrawler.wizardstataggregator.domain.stat.limited.repository
 
-import xyz.candycrawler.wizardstataggregator.domain.model.CardLimitedStats
+import xyz.candycrawler.wizardstataggregator.domain.stat.limited.model.CardLimitedStats
 
 interface CardLimitedStatsRepository {
     fun saveAll(cardStats: List<CardLimitedStats>)
+    fun findById(id: Long): CardLimitedStats
     fun findByMatchType(matchType: String): List<CardLimitedStats>
     fun findByMtgaIdAndMatchType(mtgaId: Int, matchType: String): CardLimitedStats?
 }

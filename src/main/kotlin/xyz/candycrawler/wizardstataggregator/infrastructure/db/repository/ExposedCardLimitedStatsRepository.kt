@@ -2,8 +2,9 @@ package xyz.candycrawler.wizardstataggregator.infrastructure.db.repository
 
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import xyz.candycrawler.wizardstataggregator.domain.model.CardLimitedStats
-import xyz.candycrawler.wizardstataggregator.domain.repository.CardLimitedStatsRepository
+import xyz.candycrawler.wizardstataggregator.domain.stat.limited.exception.CardLimitedStatsNotFoundException
+import xyz.candycrawler.wizardstataggregator.domain.stat.limited.model.CardLimitedStats
+import xyz.candycrawler.wizardstataggregator.domain.stat.limited.repository.CardLimitedStatsRepository
 import xyz.candycrawler.wizardstataggregator.infrastructure.db.entity.CardLimitedStatsRecord
 import xyz.candycrawler.wizardstataggregator.infrastructure.db.mapper.CardLimitedStatsSqlMapper
 
@@ -17,11 +18,15 @@ class ExposedCardLimitedStatsRepository(
         sqlMapper.insertBatch(cardStats.map { it.toRecord() })
     }
 
+    override fun findById(id: Long): CardLimitedStats =
+        sqlMapper.selectById(id)?.toDomain() ?: throw CardLimitedStatsNotFoundException(id)
+
     override fun findByMatchType(matchType: String): List<CardLimitedStats> =
         sqlMapper.selectByMatchType(matchType).map { it.toDomain() }
 
     override fun findByMtgaIdAndMatchType(mtgaId: Int, matchType: String): CardLimitedStats? =
         sqlMapper.selectByMtgaIdAndMatchType(mtgaId, matchType)?.toDomain()
+            ?: throw CardLimitedStatsNotFoundException("with MTGaId=$mtgaId and matchType $matchType not found")
 
     private fun CardLimitedStats.toRecord(): CardLimitedStatsRecord = CardLimitedStatsRecord(
         id = id,
