@@ -10,3 +10,21 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+
+infrastructure:
+  http:
+    client:
+      lands-17:
+        base-url: ${LANDS17_BASE_URL:https://www.17lands.com}
+        retry:
+          max-attempts: ${HTTP_CLIENT_LANDS17_RETRY_MAX_ATTEMPTS:3}
+          initial-delay-ms: ${HTTP_CLIENT_LANDS17_RETRY_INITIAL_DELAY_MS:500}
+          multiplier: ${HTTP_CLIENT_LANDS17_RETRY_MULTIPLIER:2.0}
+          max-delay-ms: ${HTTP_CLIENT_LANDS17_RETRY_MAX_DELAY_MS:5000}
+
+scheduler:
+  card-limited-stats:
+    enabled: ${SCHEDULER_CARD_LIMITED_STATS_ENABLED:true}
+    cron: ${SCHEDULER_CARD_LIMITED_STATS_CRON:@daily}
+    set-code: ${SCHEDULER_CARD_LIMITED_STATS_SET_CODE:DMU}

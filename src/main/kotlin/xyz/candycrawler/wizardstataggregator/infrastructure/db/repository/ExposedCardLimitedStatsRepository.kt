@@ -15,7 +15,7 @@ class ExposedCardLimitedStatsRepository(
 ) : CardLimitedStatsRepository {
 
     override fun saveAll(cardStats: List<CardLimitedStats>) {
-        sqlMapper.insertBatch(cardStats.map { it.toRecord() })
+        sqlMapper.upsertBatch(cardStats.map { it.toRecord() })
     }
 
     override fun findById(id: Long): CardLimitedStats =
@@ -24,14 +24,15 @@ class ExposedCardLimitedStatsRepository(
     override fun findByMatchType(matchType: String): List<CardLimitedStats> =
         sqlMapper.selectByMatchType(matchType).map { it.toDomain() }
 
-    override fun findByMtgaIdAndMatchType(mtgaId: Int, matchType: String): CardLimitedStats? =
-        sqlMapper.selectByMtgaIdAndMatchType(mtgaId, matchType)?.toDomain()
-            ?: throw CardLimitedStatsNotFoundException("with MTGaId=$mtgaId and matchType $matchType not found")
+    override fun findByMtgaIdAndMatchType(mtgaId: Int, setCode: String, matchType: String): CardLimitedStats? =
+        sqlMapper.selectByMtgaIdAndMatchType(mtgaId, setCode, matchType)?.toDomain()
+            ?: throw CardLimitedStatsNotFoundException("with mtgaId=$mtgaId, setCode=$setCode and matchType=$matchType not found")
 
     private fun CardLimitedStats.toRecord(): CardLimitedStatsRecord = CardLimitedStatsRecord(
         id = id,
         name = name,
         mtgaId = mtgaId,
+        setCode = setCode,
         matchType = matchType,
         color = color,
         rarity = rarity,
@@ -62,6 +63,7 @@ class ExposedCardLimitedStatsRepository(
         id = id,
         name = name,
         mtgaId = mtgaId,
+        setCode = setCode,
         matchType = matchType,
         color = color,
         rarity = rarity,

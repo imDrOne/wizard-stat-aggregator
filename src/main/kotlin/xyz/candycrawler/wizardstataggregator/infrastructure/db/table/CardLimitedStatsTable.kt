@@ -5,6 +5,7 @@ import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 object CardLimitedStatsTable : LongIdTable("card_limited_stats") {
     val name = varchar("name", 255)
     val mtgaId = integer("mtga_id")
+    val setCode = varchar("set_code", 10)
     val matchType = varchar("match_type", 50)
     val color = varchar("color", 50)
     val rarity = varchar("rarity", 50)
@@ -31,6 +32,6 @@ object CardLimitedStatsTable : LongIdTable("card_limited_stats") {
     val drawnImprovementWinRate = double("drawn_improvement_win_rate")
 
     init {
-        uniqueIndex("uq_card_stats_mtga_id_match_type", mtgaId, matchType)
+        uniqueIndex("uq_card_limited_stats_mtga_id_set_code_match_type", mtgaId, setCode, matchType)
     }
 }

@@ -6,5 +6,5 @@ interface CardLimitedStatsRepository {
     fun saveAll(cardStats: List<CardLimitedStats>)
     fun findById(id: Long): CardLimitedStats
     fun findByMatchType(matchType: String): List<CardLimitedStats>
-    fun findByMtgaIdAndMatchType(mtgaId: Int, matchType: String): CardLimitedStats?
+    fun findByMtgaIdAndMatchType(mtgaId: Int, setCode: String, matchType: String): CardLimitedStats?
 }

@@ -1,6 +1,5 @@
 package xyz.candycrawler.wizardstataggregator.configuration.client
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
@@ -12,13 +11,18 @@ import org.springframework.web.service.invoker.createClient
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.module.kotlin.jsonMapper
 import tools.jackson.module.kotlin.kotlinModule
+import xyz.candycrawler.wizardstataggregator.configuration.client.interceptor.LoggingClientHttpRequestInterceptor
+import xyz.candycrawler.wizardstataggregator.configuration.client.interceptor.RetryClientHttpRequestInterceptor
+import xyz.candycrawler.wizardstataggregator.configuration.client.property.Lands17HttpClientProperties
 import xyz.candycrawler.wizardstataggregator.infrastructure.client.lands17.Lands17ApiClient
 
 @Configuration
-class HttpClientConfig() {
+class HttpClientConfig(
+    private val props: Lands17HttpClientProperties,
+) {
 
     @Bean
-    fun lands17restApiClient(@Value("\${infrastructure.http.client.lands-17.base-url}") baseUrl: String): Lands17ApiClient {
+    fun lands17restApiClient(): Lands17ApiClient {
         val jsonMapper = jsonMapper {
             addModule(kotlinModule())
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -33,8 +37,17 @@ class HttpClientConfig() {
         }
 
         val restClient = RestClient.builder()
-            .baseUrl(baseUrl)
+            .baseUrl(props.baseUrl)
             .configureMessageConverters { it.addCustomConverter(jsonConverter).build() }
+            .requestInterceptors { interceptors ->
+                interceptors.add(RetryClientHttpRequestInterceptor(
+                    maxAttempts = props.retry.maxAttempts,
+                    initialDelayMs = props.retry.initialDelayMs,
+                    multiplier = props.retry.multiplier,
+                    maxDelayMs = props.retry.maxDelayMs,
+                ))
+                interceptors.add(LoggingClientHttpRequestInterceptor())
+            }
             .build()
 
         return HttpServiceProxyFactory

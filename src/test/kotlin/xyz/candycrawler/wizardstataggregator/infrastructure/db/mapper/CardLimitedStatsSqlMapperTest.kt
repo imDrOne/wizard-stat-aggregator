@@ -18,14 +18,15 @@ class CardLimitedStatsSqlMapperTest(
     fun `insertBatch persists all fields correctly`() {
         val record = buildRecord(mtgaId = 100)
 
-        sqlMapper.insertBatch(listOf(record))
+        sqlMapper.upsertBatch(listOf(record))
 
-        val result = sqlMapper.selectByMtgaIdAndMatchType(record.mtgaId, record.matchType)
+        val result = sqlMapper.selectByMtgaIdAndMatchType(record.mtgaId, record.setCode, record.matchType)
 
         assertNotNull(result)
         assertNotNull(result.id)
         assertEquals(record.name, result.name)
         assertEquals(record.mtgaId, result.mtgaId)
+        assertEquals(record.setCode, result.setCode)
         assertEquals(record.matchType, result.matchType)
         assertEquals(record.color, result.color)
         assertEquals(record.rarity, result.rarity)
@@ -60,7 +61,7 @@ class CardLimitedStatsSqlMapperTest(
             buildRecord(mtgaId = 202, matchType = "QuickDraft"),
         )
 
-        sqlMapper.insertBatch(records)
+        sqlMapper.upsertBatch(records)
 
         val results = sqlMapper.selectByMatchType("QuickDraft")
         val insertedMtgaIds = results.map { it.mtgaId }
@@ -71,9 +72,9 @@ class CardLimitedStatsSqlMapperTest(
     fun `insertBatch persists null nullable fields`() {
         val record = buildRecord(mtgaId = 300, avgSeen = null, avgPick = null)
 
-        sqlMapper.insertBatch(listOf(record))
+        sqlMapper.upsertBatch(listOf(record))
 
-        val result = sqlMapper.selectByMtgaIdAndMatchType(record.mtgaId, record.matchType)
+        val result = sqlMapper.selectByMtgaIdAndMatchType(record.mtgaId, record.setCode, record.matchType)
 
         assertNotNull(result)
         assertNull(result.avgSeen)
@@ -82,7 +83,7 @@ class CardLimitedStatsSqlMapperTest(
 
     @Test
     fun `selectByMatchType returns only records with given matchType`() {
-        sqlMapper.insertBatch(listOf(
+        sqlMapper.upsertBatch(listOf(
             buildRecord(mtgaId = 400, matchType = "QuickDraft"),
             buildRecord(mtgaId = 401, matchType = "QuickDraft"),
             buildRecord(mtgaId = 402, matchType = "Sealed"),
@@ -107,33 +108,44 @@ class CardLimitedStatsSqlMapperTest(
     @Test
     fun `selectByMtgaIdAndMatchType returns record when found`() {
         val record = buildRecord(mtgaId = 500, matchType = "Sealed")
-        sqlMapper.insertBatch(listOf(record))
+        sqlMapper.upsertBatch(listOf(record))
 
-        val result = sqlMapper.selectByMtgaIdAndMatchType(500, "Sealed")
+        val result = sqlMapper.selectByMtgaIdAndMatchType(500, "DMU", "Sealed")
 
         assertNotNull(result)
         assertEquals(500, result.mtgaId)
+        assertEquals("DMU", result.setCode)
         assertEquals("Sealed", result.matchType)
     }
 
     @Test
     fun `selectByMtgaIdAndMatchType returns null when mtgaId not found`() {
-        val result = sqlMapper.selectByMtgaIdAndMatchType(999999, "QuickDraft")
+        val result = sqlMapper.selectByMtgaIdAndMatchType(999999, "DMU", "QuickDraft")
 
         assertNull(result)
     }
 
     @Test
     fun `selectByMtgaIdAndMatchType returns null when matchType does not match`() {
-        sqlMapper.insertBatch(listOf(buildRecord(mtgaId = 600, matchType = "QuickDraft")))
+        sqlMapper.upsertBatch(listOf(buildRecord(mtgaId = 600, matchType = "QuickDraft")))
 
-        val result = sqlMapper.selectByMtgaIdAndMatchType(600, "Sealed")
+        val result = sqlMapper.selectByMtgaIdAndMatchType(600, "DMU", "Sealed")
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `selectByMtgaIdAndMatchType returns null when setCode does not match`() {
+        sqlMapper.upsertBatch(listOf(buildRecord(mtgaId = 700, matchType = "QuickDraft", setCode = "DMU")))
+
+        val result = sqlMapper.selectByMtgaIdAndMatchType(700, "BRO", "QuickDraft")
 
         assertNull(result)
     }
 
     private fun buildRecord(
         mtgaId: Int,
+        setCode: String = "DMU",
         matchType: String = "QuickDraft",
         avgSeen: Double? = 2.34,
         avgPick: Double? = 3.12,
@@ -141,6 +153,7 @@ class CardLimitedStatsSqlMapperTest(
         id = null,
         name = "Lightning Bolt",
         mtgaId = mtgaId,
+        setCode = setCode,
         matchType = matchType,
         color = "R",
         rarity = "common",

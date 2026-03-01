@@ -3,7 +3,7 @@ package xyz.candycrawler.wizardstataggregator.infrastructure.db.mapper
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.jdbc.batchInsert
+import org.jetbrains.exposed.v1.jdbc.batchUpsert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.springframework.stereotype.Component
 import xyz.candycrawler.wizardstataggregator.infrastructure.db.entity.CardLimitedStatsRecord
@@ -12,10 +12,15 @@ import xyz.candycrawler.wizardstataggregator.infrastructure.db.table.CardLimited
 @Component
 class CardLimitedStatsSqlMapper {
 
-    internal fun insertBatch(records: List<CardLimitedStatsRecord>) {
-        CardLimitedStatsTable.batchInsert(records) { record ->
+    internal fun upsertBatch(records: List<CardLimitedStatsRecord>) {
+        CardLimitedStatsTable.batchUpsert(
+            records,
+            keys = arrayOf(CardLimitedStatsTable.mtgaId, CardLimitedStatsTable.setCode, CardLimitedStatsTable.matchType),
+            shouldReturnGeneratedValues = false,
+        ) { record ->
             this[CardLimitedStatsTable.name] = record.name
             this[CardLimitedStatsTable.mtgaId] = record.mtgaId
+            this[CardLimitedStatsTable.setCode] = record.setCode
             this[CardLimitedStatsTable.matchType] = record.matchType
             this[CardLimitedStatsTable.color] = record.color
             this[CardLimitedStatsTable.rarity] = record.rarity
@@ -54,9 +59,13 @@ class CardLimitedStatsSqlMapper {
             .where { CardLimitedStatsTable.matchType eq matchType }
             .map { it.toRecord() }
 
-    internal fun selectByMtgaIdAndMatchType(mtgaId: Int, matchType: String): CardLimitedStatsRecord? =
+    internal fun selectByMtgaIdAndMatchType(mtgaId: Int, setCode: String, matchType: String): CardLimitedStatsRecord? =
         CardLimitedStatsTable.selectAll()
-            .where { (CardLimitedStatsTable.mtgaId eq mtgaId) and (CardLimitedStatsTable.matchType eq matchType) }
+            .where {
+                (CardLimitedStatsTable.mtgaId eq mtgaId) and
+                (CardLimitedStatsTable.setCode eq setCode) and
+                (CardLimitedStatsTable.matchType eq matchType)
+            }
             .map { it.toRecord() }
             .singleOrNull()
 
@@ -64,6 +73,7 @@ class CardLimitedStatsSqlMapper {
         id = this[CardLimitedStatsTable.id].value,
         name = this[CardLimitedStatsTable.name],
         mtgaId = this[CardLimitedStatsTable.mtgaId],
+        setCode = this[CardLimitedStatsTable.setCode],
         matchType = this[CardLimitedStatsTable.matchType],
         color = this[CardLimitedStatsTable.color],
         rarity = this[CardLimitedStatsTable.rarity],

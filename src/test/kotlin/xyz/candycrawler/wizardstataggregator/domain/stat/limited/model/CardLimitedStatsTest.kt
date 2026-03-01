@@ -13,6 +13,7 @@ class CardLimitedStatsTest {
 
         assertEquals("Lightning Bolt", stats.name)
         assertEquals(1, stats.mtgaId)
+        assertEquals("DMU", stats.setCode)
     }
 
     // ---- name ----
@@ -40,6 +41,18 @@ class CardLimitedStatsTest {
     @Test
     fun `throws when mtgaId is negative`() {
         assertFailsWith<InvalidCardLimitedStatsException> { validStats(mtgaId = -1) }
+    }
+
+    // ---- setCode ----
+
+    @Test
+    fun `throws when setCode is blank`() {
+        assertFailsWith<InvalidCardLimitedStatsException> { validStats(setCode = "  ") }
+    }
+
+    @Test
+    fun `throws when setCode is empty`() {
+        assertFailsWith<InvalidCardLimitedStatsException> { validStats(setCode = "") }
     }
 
     // ---- matchType ----
@@ -221,6 +234,7 @@ class CardLimitedStatsTest {
     private fun validStats(
         name: String = "Lightning Bolt",
         mtgaId: Int = 1,
+        setCode: String = "DMU",
         matchType: String = "QuickDraft",
         url: String = "https://example.com/card/1",
         types: List<String> = listOf("Instant"),
@@ -245,6 +259,7 @@ class CardLimitedStatsTest {
         id = null,
         name = name,
         mtgaId = mtgaId,
+        setCode = setCode,
         matchType = matchType,
         color = "R",
         rarity = "common",

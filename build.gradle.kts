@@ -60,6 +60,9 @@ dependencies {
     implementation("tools.jackson.module:jackson-module-kotlin")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+
     // Database
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.jetbrains.exposed:exposed-spring-boot4-starter:$exposedVersion")

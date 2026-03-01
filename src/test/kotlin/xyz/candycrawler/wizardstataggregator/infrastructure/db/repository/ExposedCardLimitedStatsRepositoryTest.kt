@@ -32,7 +32,7 @@ class ExposedCardLimitedStatsRepositoryTest {
 
         repository.saveAll(stats)
 
-        then(sqlMapper).should().insertBatch(expectedRecords)
+        then(sqlMapper).should().upsertBatch(expectedRecords)
     }
 
     // ---- findById ----
@@ -82,19 +82,19 @@ class ExposedCardLimitedStatsRepositoryTest {
     @Test
     fun `findByMtgaIdAndMatchType returns domain entity when record exists`() {
         val record = buildRecord(mtgaId = 5)
-        given(sqlMapper.selectByMtgaIdAndMatchType(5, "QuickDraft")).willReturn(record)
+        given(sqlMapper.selectByMtgaIdAndMatchType(5, "DMU", "QuickDraft")).willReturn(record)
 
-        val result = repository.findByMtgaIdAndMatchType(5, "QuickDraft")
+        val result = repository.findByMtgaIdAndMatchType(5, "DMU", "QuickDraft")
 
         assertEquals(record.toDomain(), result)
     }
 
     @Test
     fun `findByMtgaIdAndMatchType throws CardLimitedStatsNotFoundException when record not found`() {
-        given(sqlMapper.selectByMtgaIdAndMatchType(99, "Sealed")).willReturn(null)
+        given(sqlMapper.selectByMtgaIdAndMatchType(99, "DMU", "Sealed")).willReturn(null)
 
         assertFailsWith<CardLimitedStatsNotFoundException> {
-            repository.findByMtgaIdAndMatchType(99, "Sealed")
+            repository.findByMtgaIdAndMatchType(99, "DMU", "Sealed")
         }
     }
 
@@ -103,11 +103,13 @@ class ExposedCardLimitedStatsRepositoryTest {
     private fun buildRecord(
         id: Long? = null,
         mtgaId: Int = 1,
+        setCode: String = "DMU",
         matchType: String = "QuickDraft",
     ): CardLimitedStatsRecord = CardLimitedStatsRecord(
         id = id,
         name = "Lightning Bolt",
         mtgaId = mtgaId,
+        setCode = setCode,
         matchType = matchType,
         color = "R",
         rarity = "common",
@@ -136,11 +138,13 @@ class ExposedCardLimitedStatsRepositoryTest {
 
     private fun buildDomain(
         mtgaId: Int = 1,
+        setCode: String = "DMU",
         matchType: String = "QuickDraft",
     ): CardLimitedStats = CardLimitedStats(
         id = null,
         name = "Lightning Bolt",
         mtgaId = mtgaId,
+        setCode = setCode,
         matchType = matchType,
         color = "R",
         rarity = "common",
@@ -171,6 +175,7 @@ class ExposedCardLimitedStatsRepositoryTest {
         id = id,
         name = name,
         mtgaId = mtgaId,
+        setCode = setCode,
         matchType = matchType,
         color = color,
         rarity = rarity,
@@ -201,6 +206,7 @@ class ExposedCardLimitedStatsRepositoryTest {
         id = id,
         name = name,
         mtgaId = mtgaId,
+        setCode = setCode,
         matchType = matchType,
         color = color,
         rarity = rarity,

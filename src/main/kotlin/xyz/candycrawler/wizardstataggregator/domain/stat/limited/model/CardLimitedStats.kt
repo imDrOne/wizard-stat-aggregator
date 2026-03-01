@@ -6,6 +6,7 @@ data class CardLimitedStats(
     val id: Long? = null,
     val name: String,
     val mtgaId: Int,
+    val setCode: String,
     val matchType: String,
     val color: String,
     val rarity: String,
@@ -36,6 +37,7 @@ data class CardLimitedStats(
 
         if (name.isBlank()) invalid("name must not be blank")
         if (mtgaId <= 0) invalid("mtgaId must be positive")
+        if (setCode.isBlank()) invalid("setCode must not be blank")
         if (matchType.isBlank()) invalid("matchType must not be blank")
         if (url.isBlank()) invalid("url must not be blank")
         if (types.isEmpty()) invalid("types must not be empty")
